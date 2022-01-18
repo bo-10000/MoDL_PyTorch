@@ -4,7 +4,9 @@ PyTorch implementation of MoDL: Model Based Deep Learning Architecture for Inver
 
 Official code: https://github.com/hkaggarwal/modl
 
-## Reference paper: 
+![alt text](https://github.com/hkaggarwal/modl/blob/master/MoDL_recursive.png)
+
+## Reference paper
 
 MoDL: Model Based Deep Learning Architecture for Inverse Problems  by H.K. Aggarwal, M.P Mani, and Mathews Jacob in IEEE Transactions on Medical Imaging,  2018 
 
