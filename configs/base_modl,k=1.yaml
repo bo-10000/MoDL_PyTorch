@@ -7,7 +7,7 @@ epochs: 50
 
 dataset_name: modl_dataset
 dataset_params:
-  dataset_path: '../data/dataset.hdf5'
+  dataset_path: 'data/dataset.hdf5'
   sigma: 0.01
 val_data: False
 batch_size: 1
