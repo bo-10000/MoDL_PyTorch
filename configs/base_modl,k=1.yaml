@@ -1,0 +1,25 @@
+config_name: base_modl,k=1
+description: "base config, k=1"
+
+n_layers: 5
+k_iters: 1
+epochs: 50
+
+dataset_name: modl_dataset
+dataset_params:
+  dataset_path: '../data/dataset.hdf5'
+  sigma: 0.01
+val_data: False
+batch_size: 1
+
+model_name: base_modl
+
+restore_weights: False #False, best, inter, final
+restore_path: 
+
+loss_name: MSE
+score_names: ['PSNR', 'SSIM']
+optim_name: Adam
+optim_params:
+  lr: 0.001
+gradient_clip: True
