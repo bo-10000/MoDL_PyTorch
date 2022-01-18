@@ -42,4 +42,8 @@ scripts/test.sh
 
 ## Saved models
 
-The saved models for K=1 and K=10 are `workspace/base_modl,k=1/checkpoints/final.epoch0049-score37.3514.pth` and `workspace/base_modl,k=10/checkpoints/final.epoch0049-score39.6311.pth`
+Saved models are provided.
+
+K=1: `workspace/base_modl,k=1/checkpoints/final.epoch0049-score37.3514.pth` 
+
+K=10: `workspace/base_modl,k=10/checkpoints/final.epoch0049-score39.6311.pth`
