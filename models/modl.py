@@ -113,12 +113,3 @@ class MoDL(nn.Module):
             #dc
             x_k = self.dc(z_k, x0, csm, mask) # (2, nrow, ncol)
         return x_k
-
-        # x_k, z_k = {}, {}
-        # x_k[0] = x0
-        # for k in range(self.k_iters):
-        #     #dw 
-        #     z_k[k+1] = self.dw(x_k[k]) # (2, nrow, ncol)
-        #     #dc
-        #     x_k[k+1] = self.dc(z_k[k+1], x0, csm, mask) # (2, nrow, ncol)
-        # return x_k, z_k
