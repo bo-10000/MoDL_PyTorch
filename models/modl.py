@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
+
 from utils import r2c, c2r
+from models import mri
 
 #CNN denoiser ======================
 def conv_block(in_channels, out_channels):
@@ -42,17 +44,13 @@ class myAtA(nn.Module):
         self.mask = mask # complex (B x nrow x ncol)
         self.lam = lam
 
+        self.A = mri.SenseOp(csm, mask)
+
     def forward(self, im): #step for batch image
         """
         :im: complex image (B x nrow x nrol)
         """
-        csm = torch.swapaxes(self.csm, 0, 1)
-
-        im_coil = csm * im # split coil images (B x ncoil x nrow x ncol)
-        k_full = torch.fft.fft2(im_coil, norm='ortho') # convert into k-space
-        k_u = torch.swapaxes(k_full * self.mask, 0, 1) # undersampling
-        im_u_coil = torch.fft.ifft2(k_u, norm='ortho') # convert into image domain
-        im_u = torch.sum(im_u_coil * self.csm.conj(), axis=1) # coil combine (B x nrow x ncol)
+        im_u = self.A.adj(self.A.fwd(im))
         return im_u + self.lam * im
 
 def myCG(AtA, rhs):
@@ -110,8 +108,8 @@ class MoDL(nn.Module):
 
         x_k = x0.clone()
         for k in range(self.k_iters):
-            #dw
+            # cnn denoiser
             z_k = self.dw(x_k) # (2, nrow, ncol)
-            #dc
+            # data consistency
             x_k = self.dc(z_k, x0, csm, mask) # (2, nrow, ncol)
         return x_k
