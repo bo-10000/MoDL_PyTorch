@@ -82,6 +82,9 @@ class SenseOp():
         """
         SENSS Forward Operator: from image to k-space
         """
+        if isinstance(input, np.ndarray):
+            input = torch.from_numpy(input)
+
         N_batch, N_coil, N_y, N_x = self.coil.shape
 
         coils = torch.swapaxes(self.coil, 0, 1)
@@ -101,6 +104,9 @@ class SenseOp():
         """
         SENSE Adjoint Operator: from k-space to image
         """
+        if isinstance(input, np.ndarray):
+            input = torch.from_numpy(input)
+
         kfull = torch.swapaxes(input, 0, 1)
 
         if self.traj is None:
