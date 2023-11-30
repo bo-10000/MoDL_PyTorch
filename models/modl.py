@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
+
 from utils import r2c, c2r
+from models import mri
 
 #CNN denoiser ======================
 def conv_block(in_channels, out_channels):
@@ -25,7 +27,7 @@ class cnn_denoiser(nn.Module):
         )
 
         self.nw = nn.Sequential(*layers)
-    
+
     def forward(self, x):
         idt = x # (2, nrow, ncol)
         dw = self.nw(x) + idt # (2, nrow, ncol)
@@ -40,17 +42,15 @@ class myAtA(nn.Module):
         super(myAtA, self).__init__()
         self.csm = csm # complex (B x ncoil x nrow x ncol)
         self.mask = mask # complex (B x nrow x ncol)
-        self.lam = lam 
+        self.lam = lam
+
+        self.A = mri.SenseOp(csm, mask)
 
     def forward(self, im): #step for batch image
         """
         :im: complex image (B x nrow x nrol)
         """
-        im_coil = self.csm * im # split coil images (B x ncoil x nrow x ncol)
-        k_full = torch.fft.fft2(im_coil, norm='ortho') # convert into k-space 
-        k_u = k_full * self.mask # undersampling
-        im_u_coil = torch.fft.ifft2(k_u, norm='ortho') # convert into image domain
-        im_u = torch.sum(im_u_coil * self.csm.conj(), axis=1) # coil combine (B x nrow x ncol)
+        im_u = self.A.adj(self.A.fwd(im))
         return im_u + self.lam * im
 
 def myCG(AtA, rhs):
@@ -87,7 +87,7 @@ class data_consistency(nn.Module):
         rec = myCG(AtA, rhs)
         return rec
 
-#model =======================    
+#model =======================
 class MoDL(nn.Module):
     def __init__(self, n_layers, k_iters):
         """
@@ -105,11 +105,11 @@ class MoDL(nn.Module):
         :csm: coil sensitivity map (B, ncoil, nrow, ncol) - complex64
         :mask: sampling mask (B, nrow, ncol) - int8
         """
-        
+
         x_k = x0.clone()
         for k in range(self.k_iters):
-            #dw 
+            # cnn denoiser
             z_k = self.dw(x_k) # (2, nrow, ncol)
-            #dc
+            # data consistency
             x_k = self.dc(z_k, x0, csm, mask) # (2, nrow, ncol)
         return x_k

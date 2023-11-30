@@ -1,5 +1,7 @@
 import argparse
 import yaml, os, time
+import h5py
+
 from tqdm import tqdm
 from datetime import datetime
 from collections import defaultdict
@@ -50,10 +52,10 @@ def setup(args):
     if torch.cuda.device_count()>1:
         model = nn.DataParallel(model)
 
-    return configs, device, workspace, logger, writer, dataloader, model, score_fs
+    return configs, device, workspace, logger, writer, dataloader, model, score_fs, tensorboard_dir
 
 def main(args):
-    configs, device, workspace, logger, writer, dataloader, model, score_fs = setup(args)
+    configs, device, workspace, logger, writer, dataloader, model, score_fs, tensorboard_dir = setup(args)
 
     logger.write('\n')
     logger.write('test start: ' + datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
@@ -71,6 +73,12 @@ def main(args):
 
         y = np.abs(r2c(y.numpy(), axis=1))
         y_pred = np.abs(r2c(y_pred.numpy(), axis=1))
+
+        f = h5py.File(tensorboard_dir + '/test/recon_' + str(i).zfill(3) + '.h5', 'w')
+        f.create_dataset('recon', data=y_pred)
+        f.create_dataset('gt', data=y)
+        f.close()
+
         for score_name, score_f in score_fs.items():
             running_score[score_name] += score_f(y, y_pred) * y_pred.shape[0]
         if args.write_image > 0 and (i % args.write_image == 0):

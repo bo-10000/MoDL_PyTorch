@@ -36,9 +36,12 @@ def get_model(model_name, model_params, device):
     if model_name == 'base_modl':
         from models.modl import MoDL
         model = MoDL(**model_params)
+    elif model_name == 'base_varnet':
+        from models.varnet import VarNet
+        model = VarNet(**model_params)
 
     # if device == 'cuda' and torch.cuda.device_count()>1:
-    #     model = nn.DataParallel(model)     
+    #     model = nn.DataParallel(model)
     model.to(device)
     return model
 
@@ -57,7 +60,7 @@ def get_score_fs(score_names):
             score_f = ssim_batch
         score_fs[score_name] = score_f
     return score_fs
-        
+
 def get_optim_scheduler(optim_name, optim_params, scheduler_name, scheduler_params):
     import torch.optim as optim
     optimizer = getattr(optim, optim_name)(**optim_params)

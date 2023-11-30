@@ -11,7 +11,7 @@ def setup(args):
     config_path = args.config
     with open(config_path, "r") as fr:
         configs = yaml.load(fr, Loader=yaml.FullLoader)
-    device = 'cuda'
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     #read configs =================================
     n_layers = configs['n_layers']
@@ -29,9 +29,9 @@ def setup(args):
     model_params = configs.get('model_params', {})
     model_params['n_layers'] = n_layers
     model_params['k_iters'] = k_iters
-    
+
     restore_weights = configs['restore_weights'] #'model', 'all', False
-        
+
     loss_name = configs['loss_name']
     score_names = configs['score_names']
     optim_name = configs['optim_name']
@@ -41,7 +41,7 @@ def setup(args):
 
     # config_name = configs['config_name'] + '_' + datetime.now().strftime("%d%b%I%M%P") #ex) base_04Jun0243pm
     config_name = configs['config_name'] #ex) base
-    
+
     #dirs, logger, writers, saver =========================================
     workspace = os.path.join(args.workspace, config_name) #workspace/config_name
     checkpoints_dir, log_dir = get_dirs(workspace, remake=True) #workspace/config_name/checkpoints ; workspace/config_name/log.txt
@@ -125,7 +125,7 @@ def main(args):
             #scheduler
             if phase == 'train' and scheduler:
                 scheduler.step()
-            
+
             #write log
             epoch_score = {score_name: score / len(dataloaders[phase].dataset) for score_name, score in running_score.items()}
             for score_name, score in epoch_score.items():
@@ -146,13 +146,13 @@ def main(args):
             saver.save_model(model, epoch_score[val_score_name], epoch, final=False)
         if epoch % args.save_step == 0:
             saver.save_checkpoints(epoch, model, optimizer, scheduler)
-        
+
     if phase == 'train':
         saver.save_model(model, epoch_score[val_score_name], epoch, final=True)
 
     for phase in phases:
         writers[phase].close()
-        
+
     logger.write('-----------------------')
     logger.write('total train time: {:.2f} min'.format((time.time()-start)/60))
     logger.write('best score: {:.4f}'.format(saver.best_score))
@@ -160,7 +160,7 @@ def main(args):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--config", type=str, required=False, default="configs/base_modl,k=1.yaml",
+    parser.add_argument("--config", type=str, required=False, default="configs/base_modl,k=10.yaml",
                         help="config file path")
     parser.add_argument("--workspace", type=str, default='./workspace')
     parser.add_argument("--tensorboard_dir", type=str, default='./runs')
