@@ -80,7 +80,7 @@ class SenseOp():
 
     def fwd(self, input) -> torch.Tensor:
         """
-        SENSS Forward Operator: from image to k-space
+        SENSE Forward Operator: from image to k-space
         """
         if isinstance(input, np.ndarray):
             input = torch.from_numpy(input)

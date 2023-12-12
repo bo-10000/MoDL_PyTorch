@@ -35,7 +35,7 @@ def setup(args):
     loss_name = configs['loss_name']
     score_names = configs['score_names']
     optim_name = configs['optim_name']
-    optim_params = configs.get('optim_parmas', {})
+    optim_params = configs.get('optim_params', {})
     scheduler_name = configs.get('scheduler_name', None)
     scheduler_params = configs.get('scheduler_params', {})
 
