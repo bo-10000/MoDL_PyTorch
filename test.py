@@ -33,9 +33,9 @@ def setup(args):
 
     config_name = configs['config_name']
 
-    workspace = os.path.join(args.workspace, config_name) #workspace/config_name
+    workspace = config_output_dir(args.workspace, configs)
     checkpoints_dir, log_dir = get_dirs(workspace) #workspace/config_name/checkpoints ; workspace/config_name/log.txt
-    tensorboard_dir = os.path.join(args.tensorboard_dir, configs['config_name']) #runs/config_name
+    tensorboard_dir = config_output_dir(args.tensorboard_dir, configs)
     logger = Logger(log_dir)
     writer = get_writers(tensorboard_dir, ['test'])['test']
 

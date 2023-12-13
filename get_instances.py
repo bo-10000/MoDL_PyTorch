@@ -2,6 +2,20 @@ import os, shutil
 import torch
 import torch.nn as nn
 
+def config_output_dir(base_dir, configs):
+
+    dir_name  = configs['model_name']
+    dir_name += '_layer-' + str(configs['n_layers']).zfill(2)
+    dir_name += '_iter-' + str(configs['k_iters']).zfill(2)
+    dir_name += '_epoch-' + str(configs['epochs']).zfill(3)
+    dir_name += '_loss-' + configs['loss_name']
+    dir_name += '_optim-' + configs['optim_name']
+
+    optim_params = configs.get('optim_params', {})
+    dir_name += '_lr-' + "{:.6f}".format(optim_params['lr'])
+
+    return os.path.join(base_dir, dir_name)
+
 def get_dirs(workspace, remake=False):
     #if path already exists, remove and make it again.
     if remake:
