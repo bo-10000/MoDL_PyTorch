@@ -49,11 +49,11 @@ class VarNet(nn.Module):
     def forward(self, x0, coil, mask):
 
         x0 = r2c(x0, axis=1)
-        xk = x0.clone()
+        x = x0.clone()
 
         for c in range(self.n_cascades):
 
-            x = self.dc(xk, x0, coil, mask)
+            x = self.dc(x, x0, coil, mask)
             x = x - r2c(self.dw(c2r(x, axis=1)), axis=1)
 
         return c2r(x, axis=1)
